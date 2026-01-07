@@ -1,7 +1,28 @@
 from fastapi import FastAPI, Path, HTTPException
 from google import genai
-from pydantic import BaseModel, Field
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
 app = FastAPI(title="WorkScore Calculator API")
+
+# You can add additional URLs to this list, for example, the frontend's production domain, or other frontends.
+allowed_origins = [
+    "http://localhost:3000"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=allowed_origins,
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE"],
+    allow_headers=["X-Requested-With", "Content-Type"],
+)
+
+
+
+from pydantic import BaseModel, Field
+
 from helper import *
 
 # user_id = "ethan-arch"
@@ -9,8 +30,48 @@ from fastapi import FastAPI, Path, HTTPException
 from typing import List
 import json
 
-app = FastAPI(title="WorkScore Calculator API")
 
+
+
+@app.get("/users/{user_id}/data")
+async def get_user_full_data(user_id: str = Path(..., description="The ID/username to fetch data for")):
+    """
+    Returns all raw activity data for a specific user across all platforms.
+    """
+    try:
+        # 1. Load the raw data sources
+        slack_data = load_json("slack_data.json")
+        github_data = load_json("github_commits.json")
+        transcripts_data = load_json("meeting.json")
+
+        # 2. Extract user-specific records using your helper functions
+        user_slack = get_user_slack_messages(slack_data, user_id)
+        user_github = get_user_github_commits(github_data, user_id)
+        user_meetings = get_user_meeting_transcripts_with_context(transcripts_data, user_id)
+
+        # 3. Check if the user actually has any data
+        if not user_slack and not user_github and not user_meetings:
+            raise HTTPException(status_code=404, detail=f"No data found for user: {user_id}")
+
+        # 4. Return the aggregated "Profile"
+        return {
+            "user_id": user_id,
+            "stats": {
+                "slack_message_count": len(user_slack),
+                "github_commit_count": len(user_github),
+                "meetings_attended": len(user_meetings)
+            },
+            "raw_data": {
+                "slack": user_slack,
+                "github": user_github,
+                "meetings": user_meetings
+            }
+        }
+
+    except FileNotFoundError as e:
+        raise HTTPException(status_code=500, detail=f"Data file missing: {str(e)}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 def get_all_registered_users() -> List[str]:
     """Extracts the predefined user list from the workspace JSON."""
@@ -133,19 +194,16 @@ async def get_work_score(user_id: str = Path(..., description="The GitHub/Slack 
         Calculation Logic:
         
         1. BasePoints: Default to 10 unless specified otherwise.
-        2. Difficulty upto 5: Based on Github Commits and codediff changes        
+        2. Difficulty 1 to 5: Based on Github Commits and codediff changes        
         3. PeerKudos (Count): Total count of unique instances of peer appreciation or public "thank-yous."
         4. BlockerPenalty (Flat Sum): Deduct 10 points for every instance where the user explicitly blocked progress, missed a deadline, or broke a build.
         
-        **Formula:**
-        ```work_score = (base_points * difficulty) + (peer_kudos * 1.5) - (BlockerPenalty)```
         **Constraint:** Return **ONLY** a valid JSON object. Do not include introductory text or markdown explanations.
-        
-        
+    
         """
-
+        print(prompt)
         response = client.models.generate_content(
-            model="gemini-2.5-flash",
+            model="gemini-2.5-flash-lite",
             contents=prompt,
             config={
                 "response_mime_type": "application/json",
@@ -170,4 +228,4 @@ async def get_work_score(user_id: str = Path(..., description="The GitHub/Slack 
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="localhost", port=8000)

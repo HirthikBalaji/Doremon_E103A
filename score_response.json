@@ -1,0 +1,21 @@
+{
+  "analysis_summary": {
+    "difficulty_rationale": "The system architecture was redesigned to support scalability and multi-tenancy, and an event-driven pipeline using Kafka was introduced. These are significant architectural changes indicating a higher level of difficulty.",
+    "kudos_evidence": [
+      "ethan-arch shared code -> acknowledged by bob-backend in Slack: Perfect, thanks! I\u2019ll adapt this and commit."
+    ],
+    "penalty_evidence": [
+      "Meeting M2: charlie-frontend: That\u2019s not ready yet. I underestimated the effort.",
+      "Meeting M2: ethan-arch: The client specifically asked for role-based views this sprint. charlie-frontend: I know. I missed the timeline.",
+      "Meeting M3: alice-dev: I didn\u2019t ask questions early and assumed things. That caused confusion.",
+      "Meeting M3: charlie-frontend: I underestimated complexity and stayed quiet about delays.",
+      "Meeting M3: ethan-arch: Both of those caused real issues, wrong assumptions and missed deadlines."
+    ]
+  },
+  "variables": {
+    "base_points": 10,
+    "difficulty_factor": 4.5,
+    "peer_kudos_count": 1,
+    "blocker_penalty_total": 50
+  }
+}

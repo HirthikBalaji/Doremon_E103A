@@ -2,17 +2,17 @@
 
 ## 1. Core Contribution Equation (High-Level)
 
-$
+$$
 \boxed{
 \text{Contribution Score (CS)} =
 \Big( \sum_{i=1}^{N} W_i \cdot A_i \Big)
 \times Q
 \times C
-\times P
-;-;
+\times P 
+-
 B
 }
-$
+$$
 
 This keeps it **modular, explainable, and tunable**.
 
@@ -20,9 +20,9 @@ This keeps it **modular, explainable, and tunable**.
 
 ## 2. Base Work Done (Activity Contribution)
 
-$
+$$
 \text{Base Work} = \sum_{i=1}^{N} W_i \cdot A_i
-$
+$$
 
 Where:
 
@@ -44,9 +44,9 @@ Where:
 
 ## 3. Quality Multiplier (Peer Review + Outcomes)
 
-$
+$$
 Q = 1 + \alpha \cdot R + \beta \cdot S
-$
+$$
 
 Where:
 
@@ -60,9 +60,9 @@ Where:
 
 ## 4. Collaboration & Knowledge Sharing Factor
 
-$
+$$
 C = 1 + \gamma \cdot K
-$
+$$
 
 Where:
 
@@ -73,9 +73,9 @@ Where:
 
 ## 5. Peer Recognition / Kudos Factor
 
-$
+$$
 P = 1 + \delta \cdot \log(1 + U)
-$
+$$
 
 Where:
 

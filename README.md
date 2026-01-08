@@ -8,8 +8,7 @@ $$
 \Big( \sum_{i=1}^{N} W_i \cdot A_i \Big)
 \times Q
 \times C
-\times P 
--
+\times P -
 B
 }
 $$
